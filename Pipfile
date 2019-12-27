@@ -9,6 +9,8 @@ autopep8 = "*"
 [packages]
 django = "*"
 pillow = "*"
+social-auth-app-django = "*"
+django-sslserver = "*"
 
 [requires]
 python_version = "3.7"
