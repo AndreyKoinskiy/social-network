@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'django.contrib.admin',
     'bookmarks.apps.BookmarksConfig',
+    'images.apps.ImagesConfig',
 
     'social_django',
 ]
