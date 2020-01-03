@@ -9,7 +9,7 @@ verify_ssl = true
 pillow = "*"
 social-auth-app-django = "*"
 sorl-thumbnail = "*"
-django = "==2.2"
+django = "==2.2.8"
 
 [requires]
 python_version = "3.7"
