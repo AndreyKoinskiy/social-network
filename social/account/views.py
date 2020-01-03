@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
@@ -10,6 +12,16 @@ from django.contrib import messages
 from .models import Profile
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 
+@login_required
+def user_list(request):
+    users = User.objects.filter(is_active =True)
+    return render(request,'account/user/list.html',{'section':'people','users':users})
+
+@login_required
+def user_detail(request,username):
+    user = get_object_or_404(User, username=username, is_active = True)
+    print(user.images_created.all().count())
+    return render(request, 'account/user/detail.html',{'section':'people','user':user})
 
 @login_required
 def edit(request):
@@ -28,7 +40,6 @@ def edit(request):
         profile_form = ProfileEditForm(instance=request.user.profile)
     return render(request, 'account/edit.html',{'user_form':user_form, 'profile_form':profile_form})
 
-
 def registarion(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
@@ -42,11 +53,9 @@ def registarion(request):
         user_form = UserRegistrationForm()
     return render(request, 'account/register.html', {'user_form': user_form})
 
-
 @login_required
 def dashboard(request):
     return render(request, 'account/dashboard.html', {'section': 'dashboard'})
-
 
 def user_login(request):
     if request.method == 'POST':
@@ -66,3 +75,4 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'account/login.html', {'form': form})
+
