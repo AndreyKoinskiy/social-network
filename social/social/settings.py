@@ -25,13 +25,16 @@ SECRET_KEY = '-07(l*&=w$5+_wzd#or1kiq26qoxk5a_9(l6eq0j6(6q0@v%4='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mysite.com','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mysite.com',
+                'localhost', 
+                '127.0.0.1',
+                '59527522.ngrok.io',
+                ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "sslserver",
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
 
     'social_django',
+    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [

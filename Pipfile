@@ -4,13 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-autopep8 = "*"
 
 [packages]
-django = "*"
+django = "==3.0"
 pillow = "*"
 social-auth-app-django = "*"
-django-sslserver = "*"
+sorl-thumbnail = "*"
 
 [requires]
 python_version = "3.7"
