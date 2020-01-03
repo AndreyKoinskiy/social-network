@@ -6,10 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-django = "==3.0"
 pillow = "*"
 social-auth-app-django = "*"
 sorl-thumbnail = "*"
+django = "==2.2"
 
 [requires]
 python_version = "3.7"
