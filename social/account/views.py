@@ -23,10 +23,10 @@ def dashboard(request):
     actions = Action.objects.exclude(user=request.user)
     following_ids = request.user.following.values_list('id', flat=True)
     if following_ids:
-    # Если текущий пользователь подписался на кого-то,
-    # отображаем только действия этих пользователей.
-    actions = actions.filter(user_id__in=following_ids)
-    actions = actions.select_related('use', 'user__profile')[:10]
+        # Если текущий пользователь подписался на кого-то,
+        # отображаем только действия этих пользователей.
+        actions = actions.filter(user_id__in=following_ids)
+        actions = actions.select_related('use', 'user__profile')[:10]
     return render(request, 'account/dashboard.html', {'section': 'dashboard', 'actions': actions})
 
 
