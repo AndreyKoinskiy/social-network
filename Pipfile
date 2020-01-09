@@ -10,6 +10,7 @@ pillow = "*"
 social-auth-app-django = "*"
 sorl-thumbnail = "*"
 django = "==2.2"
+redis = "*"
 
 [requires]
 python_version = "3.7"
