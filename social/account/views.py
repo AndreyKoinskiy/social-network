@@ -11,10 +11,24 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-
+from actions.utils import create_action
 from .models import Profile, Contact
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 from common.decorators import ajax_required
+
+
+@login_required
+def dashboard(request):
+    # По умолчанию отображаем все действия.
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.values_list('id', flat=True)
+    if following_ids:
+    # Если текущий пользователь подписался на кого-то,
+    # отображаем только действия этих пользователей.
+    actions = actions.filter(user_id__in=following_ids)
+    actions = actions.select_related('use', 'user__profile')[:10]
+    return render(request, 'account/dashboard.html', {'section': 'dashboard', 'actions': actions})
+
 
 @ajax_required
 @require_POST
@@ -24,26 +38,32 @@ def user_follow(request):
     action = request.POST.get('action')
     if user_id and action:
         try:
-            user = User.objects.get(id = user_id)
+            user = User.objects.get(id=user_id)
             if action == 'follow':
-                Contact.objects.get_or_create(user_from = request.user, user_to = user)
+                Contact.objects.get_or_create(
+                    user_from=request.user, user_to=user)
+                create_action(request.user, 'is following', user)
             else:
-                Contact.objects.filter(user_from = request.user, user_to = user).delete()
-            return JsonResponse({"status":'ok'})
+                Contact.objects.filter(
+                    user_from=request.user, user_to=user).delete()
+            return JsonResponse({"status": 'ok'})
         except User.DoesNotExist:
-            return JsonResponse({"status":"ok"})
-    return JsonResponse({"status":"ok"})
+            return JsonResponse({"status": "ok"})
+    return JsonResponse({"status": "ok"})
+
 
 @login_required
 def user_list(request):
-    users = User.objects.filter(is_active =True)
-    return render(request,'account/user/list.html',{'section':'people','users':users})
+    users = User.objects.filter(is_active=True)
+    return render(request, 'account/user/list.html', {'section': 'people', 'users': users})
+
 
 @login_required
-def user_detail(request,username):
-    user = get_object_or_404(User, username=username, is_active = True)
+def user_detail(request, username):
+    user = get_object_or_404(User, username=username, is_active=True)
     print(user.images_created.all())
-    return render(request, 'account/user/detail.html',{'section':'people','user':user})
+    return render(request, 'account/user/detail.html', {'section': 'people', 'user': user})
+
 
 @login_required
 def edit(request):
@@ -54,13 +74,14 @@ def edit(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.successfully(request,'Profile updated successfully')
+            messages.successfully(request, 'Profile updated successfully')
         else:
             messages.error(request, 'Error updating your profile')
     else:
         user_form = UserEditForm(instance=request.user)
         profile_form = ProfileEditForm(instance=request.user.profile)
-    return render(request, 'account/edit.html',{'user_form':user_form, 'profile_form':profile_form})
+    return render(request, 'account/edit.html', {'user_form': user_form, 'profile_form': profile_form})
+
 
 def registarion(request):
     if request.method == 'POST':
@@ -70,14 +91,17 @@ def registarion(request):
             new_user.set_password(user_form.cleaned_data['password'])
             new_user.save()
             Profile.objects.create(user=new_user)
+            create_action(request.user, 'likes', image)
             return render(request, 'account/register_done.html', {'new_user': new_user})
     else:
         user_form = UserRegistrationForm()
     return render(request, 'account/register.html', {'user_form': user_form})
 
+
 @login_required
 def dashboard(request):
     return render(request, 'account/dashboard.html', {'section': 'dashboard'})
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -97,4 +121,3 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'account/login.html', {'form': form})
-

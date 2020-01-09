@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from  .forms import ImageCreateForm
 from .models import Image
+from actions.utils import create_action
 from common.decorators import ajax_required
 
 
@@ -22,6 +23,7 @@ def image_create(request):
             new_item = form.save(commit = False)
             new_item.user = request.user
             new_item.save()
+            create_action(request.user, 'bookmarked image', new_item)
             return redirect(new_item.get_absolute_url())
     else:
         form = ImageCreateForm(data = request.GET)
@@ -42,6 +44,7 @@ def image_like(request):
             image = Image.objects.get(id = image_id)
             if action == 'like':
                 image.users_like.add(request.user)
+                create_action(request.user, 'likes', image)
             else:
                 image.users_like.remove(request.user)
             return JsonResponse({'status':'ok'})
